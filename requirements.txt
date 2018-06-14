@@ -2,3 +2,4 @@ requests
 numpy
 tensorflow
 keras
+h5py

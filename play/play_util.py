@@ -14,10 +14,10 @@ def train(player, training_policy):
         if game_state.has_error():
             break
         reward = get_reward(game_state, player)
-        training_policy.fit(reward, game_state)
+        training_policy.learn(reward, game_state)
         if game_state.is_finished():
             break
-    training_policy.decay()
+    training_policy.decay_exploration_rate()
     print_winner(game_state)
 
 

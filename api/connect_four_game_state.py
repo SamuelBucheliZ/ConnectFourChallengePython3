@@ -7,7 +7,7 @@ class GameState(object):
         self._json = json
 
     def get_current_player(self):
-        return self._json['currentPlayer']
+        return self._json.get('currentPlayer', None)
 
     def is_draw(self):
         return self._json.get('draw', False)
@@ -23,7 +23,7 @@ class GameState(object):
 
     def get_current_player_color(self):
         current_player = self.get_current_player()
-        for player in self._json['players']:
+        for player in self._json.get('players', []):
             if player['playerId'] == current_player:
                 return player['disc']
 
@@ -60,47 +60,9 @@ class GameState(object):
 
         return column
 
-    def _is_full(self, column):
+    @staticmethod
+    def _is_full(column):
         return 'EMPTY' not in column
-
-    # def columns(self):
-    #     return len(self.board()[0])
-    #
-    # def rows(self):
-    #     return len(self.board())
-    #
-    # def shape(self):
-    #     return self.rows(), self.columns()
-    #
-    # def possible_columns(self):
-    #     c = self.columns()
-    #     out = []
-    #     for i in range(c):
-    #         if self.free_space_column(i) < c:
-    #             out.append(i)
-    #     return out
-    #
-    # def state_column(self, n):
-    #     board = self.board()
-    #
-    #     columns = []
-    #     for row in board:
-    #         columns.append(row[n])
-    #
-    #     return columns
-    #
-    # def free_space_column(self, n):
-    #     column = self.state_column(n)
-    #     free_space = 0
-    #     for c in column:
-    #         if c == 'EMPTY':
-    #             free_space += 1
-    #
-    #     return free_space
-    #
-    # def state_row(self, n):
-    #     board = self.board()
-    #     return board[n]
 
     def __str__(self):
         return json.dumps(self._json)
