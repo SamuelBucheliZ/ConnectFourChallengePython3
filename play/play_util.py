@@ -3,40 +3,38 @@ CHECKPOINT_RATE = 10
 
 def play(player):
     player.register()
-    while True:
-        game_state = player.one_step()
-        if game_state.is_finished():
-            break
+    game_state = player.wait_until_game_ready()
+    while not game_state.is_finished:
+        game_state = player.wait_for_turn()
+        game_state = player.one_step(game_state)
     print_winner(game_state)
 
 
-def train(player, training_policy):
-    player.register()
-    training_policy.load_model()
-    number_of_games = 0
-    while True:
-        game_state = player.one_step()
+def train2(learning_players):
+    assert len(learning_players) == 2
+    for learning_player in learning_players:
+        learning_player.register()
+
+    game_state = learning_players[0].wait_until_game_ready()
+
+    if learning_players[0].is_players_turn(game_state):
+        current = 0
+    else:
+        current = 1
+
+    for learning_player in learning_players:
+        learning_player.game_started()
+
+    while not game_state.is_finished():
+        learning_players[current].make_one_step_and_learn(game_state)
         if game_state.has_error():
-            break
-        reward = get_reward(game_state, player)
-        training_policy.learn(reward, game_state)
-        if game_state.is_finished():
-            break
-    number_of_games += 1
-    training_policy.decay_exploration_rate()
-    if number_of_games % CHECKPOINT_RATE == 0:
-        training_policy.checkpoint()
+            break # TODO: Maybe throw exception?
+        current = (current + 1) % 2
+
+    for learning_player in learning_players:
+        learning_player.game_finished()
+
     print_winner(game_state)
-
-
-def get_reward(game_state, player):
-    reward = 0
-    if game_state.is_finished():
-        if game_state.get_winner() == player.get_id():
-            reward = 1
-        else:
-            reward = -1
-    return reward
 
 
 def print_winner(game_state):

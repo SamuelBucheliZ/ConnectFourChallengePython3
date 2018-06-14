@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import numpy as np
 from keras import Sequential
@@ -16,11 +17,18 @@ NUMBER_OF_COLUMNS = 7
 NUMBER_OF_ROWS = 6
 
 
+def load_or_create_model(model_file):
+    if Path(model_file).is_file():
+        return load_model(model_file)
+    else:
+        return create_model()
+
+
 def create_model():
     model = Sequential()
     model.add(InputLayer(batch_input_shape=(1, NUMBER_OF_ROWS * NUMBER_OF_COLUMNS), name='input'))
-    model.add(Dense(10, input_shape=(NUMBER_OF_ROWS*NUMBER_OF_COLUMNS,), activation=sigmoid, name='hidden'))
-    model.add(Dense(NUMBER_OF_COLUMNS, input_shape=(10, ), activation=linear, name='output'))
+    model.add(Dense(10, input_shape=(NUMBER_OF_ROWS * NUMBER_OF_COLUMNS,), activation=sigmoid, name='hidden'))
+    model.add(Dense(NUMBER_OF_COLUMNS, input_shape=(10,), activation=linear, name='output'))
     model.compile(loss=mean_squared_error, optimizer=adam(), metrics=[mean_absolute_error])
     return model
 

@@ -7,21 +7,13 @@ from .model_util import game_state_to_vec, reshape_qvalues, create_index_mask, r
 
 class KerasTrainingPolicy(object):
 
-    def __init__(self, model_file=None, exploration_rate=0.5, decay_factor=0.999, discounting_factor=0.95):
-        self._model_file = model_file
+    def __init__(self, model, exploration_rate=0.5, decay_factor=0.999, discounting_factor=0.95):
+        self._model = model
         self._exploration_rate = exploration_rate
         self._decay_factor = decay_factor
         self._discounting_factor = discounting_factor
-        self._model = None
         self._last_state_vec = None
         self._last_move = None
-
-    def load_model(self):
-        # model load needs to happen in child process, else troubles: https://github.com/keras-team/keras/issues/3181
-        if self._model_file:
-            self._model = read_model(self._model_file)
-        else:
-            self._model = create_model()
 
     def pick_column(self, game_state):
         game_state_vec = game_state_to_vec(game_state)
@@ -52,12 +44,11 @@ class KerasTrainingPolicy(object):
         updated_qvalues_vec[self._last_move] = last_state_qvalue_updated
         self._fit(self._last_state_vec, updated_qvalues_vec)
 
-    def decay_exploration_rate(self):
-        self._exploration_rate = self._exploration_rate * self._decay_factor
+    def game_started(self):
+        pass
 
-    def checkpoint(self):
-        if self._model_file:
-            save_model(self._model, self._model_file) # TODO: Maybe add timestamp
+    def game_finished(self):
+        self._exploration_rate = self._exploration_rate * self._decay_factor
 
     def _predict(self, state_vec):
         return self._model.predict(state_vec)[0]

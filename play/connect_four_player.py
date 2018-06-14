@@ -8,7 +8,7 @@ class Player(object):
         self._player_id = player_id
         self._policy = policy
         self._polling_interval = polling_interval
-        self._number_of_games = 0 # TODO: Add statistics
+        self._number_of_games = 0  # TODO: Add statistics
         self._number_of_wins = 0
         self._game_id = None
 
@@ -19,20 +19,22 @@ class Player(object):
     def get_id(self):
         return self._player_id
 
-    def one_step(self):
+    def wait_until_game_ready(self):
+        return self._wait(lambda g: not g.has_error())
+
+    def wait_for_turn(self):
+        return self._wait(lambda g: g.get_current_player() == self._player_id or g.is_finished())
+
+    def _wait(self, predicate):
         while True:
             game_state = self._get_game_state()
-            if game_state.get_current_player() == self._player_id:
-                game_state = self._drop_disc(game_state)
-                break
-            if game_state.is_finished():
-                break
+            if predicate(game_state):
+                return game_state
             time.sleep(self._polling_interval)
-        return game_state
+
+    def one_step(self, game_state):
+        column = self._policy.pick_column(game_state)
+        return self._client.drop_disc(self._game_id, self._player_id, column)
 
     def _get_game_state(self):
         return self._client.get_game_state(self._game_id)
-
-    def _drop_disc(self, game_state):
-        column = self._policy.pick_column(game_state)
-        return self._client.drop_disc(self._game_id, self._player_id, column)
