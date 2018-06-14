@@ -8,6 +8,8 @@ class Player(object):
         self._player_id = player_id
         self._policy = policy
         self._polling_interval = polling_interval
+        self._number_of_games = 0 # TODO: Add statistics
+        self._number_of_wins = 0
         self._game_id = None
 
     def register(self):

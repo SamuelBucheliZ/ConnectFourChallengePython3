@@ -1,36 +1,32 @@
 from multiprocessing import Process
 
 from api import ConnectFourClient
-from play import Player
-from play import RandomPolicy
 from play import KerasTrainingPolicy
-from play import play, train, create_model, save_model, read_model
-
+from play import Player
+from play import train
 
 HOST = 'localhost'
 PORT = 8080
-NUMBER_OF_ITERATIONS = 10
-MODEL_FILE = 'models/model.h5'
+NUMBER_OF_ITERATIONS = 50
+MODEL1_FILE = 'models/model1.h5'
+MODEL2_FILE = 'models/model2.h5'
 
 
 def main():
     host = HOST
     port = PORT
     client = ConnectFourClient(host, port)
-    #model = create_model()
-    model = read_model(MODEL_FILE)
-    player1_training_policy = KerasTrainingPolicy(model)
-    #player2_training_policy = KerasTrainingPolicy(model)
+    player1_training_policy = KerasTrainingPolicy(MODEL1_FILE)
+    player2_training_policy = KerasTrainingPolicy(MODEL2_FILE)
     player1 = Player(client, 'player1', player1_training_policy)
-    player2 = Player(client, 'player2', RandomPolicy())
+    player2 = Player(client, 'player2', player2_training_policy)
     for i in range(NUMBER_OF_ITERATIONS):
         process1 = Process(target=train, args=(player1, player1_training_policy))
-        process2 = Process(target=play, args=(player2, ))
+        process2 = Process(target=train, args=(player2, player2_training_policy))
         process1.start()
         process2.start()
         process1.join()
         process2.join()
-    save_model(model, MODEL_FILE)
 
 
 if __name__ == '__main__':

@@ -1,3 +1,6 @@
+CHECKPOINT_RATE = 10
+
+
 def play(player):
     player.register()
     while True:
@@ -9,6 +12,8 @@ def play(player):
 
 def train(player, training_policy):
     player.register()
+    training_policy.load_model()
+    number_of_games = 0
     while True:
         game_state = player.one_step()
         if game_state.has_error():
@@ -17,7 +22,10 @@ def train(player, training_policy):
         training_policy.learn(reward, game_state)
         if game_state.is_finished():
             break
+    number_of_games += 1
     training_policy.decay_exploration_rate()
+    if number_of_games % CHECKPOINT_RATE == 0:
+        training_policy.checkpoint()
     print_winner(game_state)
 
 
