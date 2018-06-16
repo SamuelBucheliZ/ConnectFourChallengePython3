@@ -27,8 +27,9 @@ def load_or_create_model(model_file):
 def create_model():
     model = Sequential()
     model.add(InputLayer(batch_input_shape=(1, NUMBER_OF_ROWS * NUMBER_OF_COLUMNS), name='input'))
-    model.add(Dense(10, input_shape=(NUMBER_OF_ROWS * NUMBER_OF_COLUMNS,), activation=sigmoid, name='hidden'))
-    model.add(Dense(NUMBER_OF_COLUMNS, input_shape=(10,), activation=linear, name='output'))
+    model.add(Dense(NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * 2, input_shape=(NUMBER_OF_ROWS * NUMBER_OF_COLUMNS,), activation=sigmoid, name='hidden1'))
+    model.add(Dense(NUMBER_OF_COLUMNS*2, input_shape=(NUMBER_OF_COLUMNS * NUMBER_OF_ROWS * 2,), activation=sigmoid, name='hidden2'))
+    model.add(Dense(NUMBER_OF_COLUMNS, input_shape=(NUMBER_OF_COLUMNS*2,), activation=linear, name='output'))
     model.compile(loss=mean_squared_error, optimizer=adam(), metrics=[mean_absolute_error])
     return model
 

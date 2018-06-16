@@ -7,4 +7,4 @@ from .connect_four_keras_training_policy import KerasTrainingPolicy
 from .model_util import load_or_create_model, save_model
 
 from .play_util import play
-from .play_util import train2
+from .play_util import train

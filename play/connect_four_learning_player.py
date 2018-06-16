@@ -1,7 +1,7 @@
 from .connect_four_player import Player
 
 
-class LearningPlayer():
+class LearningPlayer(object):
     def __init__(self, client, player_id, training_policy):
         self._player = Player(client, player_id, training_policy)
         self._policy = training_policy
